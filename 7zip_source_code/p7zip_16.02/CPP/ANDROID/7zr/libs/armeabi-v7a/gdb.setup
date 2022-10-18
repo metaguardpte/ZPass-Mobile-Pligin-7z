@@ -1,0 +1,2 @@
+set solib-search-path C:/Users/EDZ/Downloads/p7zip_16.02/CPP/ANDROID/7zr/obj/local/armeabi-v7a
+directory D:/android-ndk-r16b/build//../sysroot D:/android-ndk-r16b/build//../sources/cxx-stl/system/include C:/Users/EDZ/Downloads/p7zip_16.02/CPP/ANDROID/7zr/jni
