@@ -165,6 +165,7 @@ add_executable(7zr
   "../../../../CPP/myWindows/myAddExeFlag.cpp"
   "../../../../CPP/myWindows/mySplitCommandLine.cpp"
   "../../../../CPP/myWindows/wine_date_and_time.cpp"
+  "../../../../CPP/7zip/p7zip.cpp"
 )
 
 
