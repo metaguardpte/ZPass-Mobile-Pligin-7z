@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:zip_plugin/zip_plugin.dart';
-import 'p7zip.dart';
 
 void main() async {
   runApp(const MyApp());
