@@ -7,15 +7,17 @@ import 'package:zip_plugin/p7zip.dart';
 
 void main() async {
   runApp(const MyApp());
+  final dir = await getTemporaryDirectory();
+  final cachePath = dir.path;
   print("demo start~~~~~~~~~~~~~~~~~");
   await MyApp.copyBundleToCache("test_files", "linkfox.png");
-  await compressPath("/data/user/0/com.example.zip_plugin_example/cache", "/data/user/0/com.example.zip_plugin_example/cache/abc.7z");
-  MyApp.showDirectoryFiles("/data/user/0/com.example.zip_plugin_example/cache");
+  await compressPath(cachePath, cachePath + "/abc.7z");
+  MyApp.showDirectoryFiles(cachePath);
   print("compressPath end~~~~~~~~~~~~~~~~~");
 
   await MyApp.copyBundleToCache("test_files", "db.7z");
-  await decompress("/data/user/0/com.example.zip_plugin_example/cache/db.7z", "/data/user/0/com.example.zip_plugin_example/cache/db");
-  MyApp.showDirectoryFiles("/data/user/0/com.example.zip_plugin_example/cache/db");
+  await decompress(cachePath + "/db.7z", cachePath + "/db");
+  MyApp.showDirectoryFiles(cachePath + "/db");
 
   print("demo end~~~~~~~~~~~~~~~~~");
 }
