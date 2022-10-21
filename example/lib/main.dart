@@ -1,24 +1,23 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
-import 'package:zip_plugin/zip_plugin.dart';
+import 'package:zip_plugin/p7zip.dart';
 
 void main() async {
   runApp(const MyApp());
+  print("demo start~~~~~~~~~~~~~~~~~");
+  await MyApp.copyBundleToCache("test_files", "linkfox.png");
+  await compressPath("/data/user/0/com.example.zip_plugin_example/cache", "/data/user/0/com.example.zip_plugin_example/cache/abc.7z");
+  MyApp.showDirectoryFiles("/data/user/0/com.example.zip_plugin_example/cache");
+  print("compressPath end~~~~~~~~~~~~~~~~~");
 
-  final dir = await getTemporaryDirectory();
-  List<String> files = [];
-  files.add(dir.path + "/*");
+  await MyApp.copyBundleToCache("test_files", "db.7z");
+  await decompress("/data/user/0/com.example.zip_plugin_example/cache/db.7z", "/data/user/0/com.example.zip_plugin_example/cache/db");
+  MyApp.showDirectoryFiles("/data/user/0/com.example.zip_plugin_example/cache/db");
 
-  await compress(files, "/data/user/0/com.example.zip_plugin_example/cache/abc.7z");
-  MyApp.showDirectoryFiles(dir.path);
-
-  //await deCompress("/data/user/0/com.example.zip_plugin_example/cache/abc.7z", "/data/user/0/com.example.zip_plugin_example/cache/abc");
-  //MyApp.showDirectoryFiles("/data/user/0/com.example.zip_plugin_example/cache/abc");
-
+  print("demo end~~~~~~~~~~~~~~~~~");
 }
 
 class MyApp extends StatefulWidget {
@@ -32,14 +31,25 @@ class MyApp extends StatefulWidget {
     for(FileSystemEntity f in fileList){
       print("---------");
       print("path:" + f.path);
-      print(f.existsSync());
       if (FileSystemEntity.isDirectorySync(f.path)) {
         showDirectoryFiles(f.path);
       } else {
-        print("length:");print(File(f.path).lengthSync());
+        print(File(f.path).lengthSync());
       }
 
     }
+  }
+
+  static Future copyBundleToCache(String bundlePath, String fileName) async{
+    final dir = await getTemporaryDirectory();
+    final libFile = File(dir.path + "/" + fileName);
+
+    // 从rootBundle加载出assets资源
+    final data = await rootBundle.load(bundlePath + "/" + fileName);
+
+    final createFile = await libFile.create();
+    final writeFile = await createFile.open(mode: FileMode.write);
+    await writeFile.writeFrom(Uint8List.view(data.buffer));
   }
 
   const MyApp({super.key});
@@ -50,7 +60,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _zipPlugin = ZipPlugin();
 
   @override
   void initState() {
@@ -64,8 +73,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _zipPlugin.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = 'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
