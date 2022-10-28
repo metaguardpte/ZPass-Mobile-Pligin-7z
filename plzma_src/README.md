@@ -1,3 +1,5 @@
+delegatePlzma.cpp is the entrance to access 7zip functions
+
 ### build so for android
 1. go to android/
 2. execute ndk-build (r25b) 

@@ -9,15 +9,33 @@ void main() async {
   runApp(const MyApp());
   final dir = await getTemporaryDirectory();
   final cachePath = dir.path;
+  final seperator = Platform.pathSeparator;
+
   print("demo start~~~~~~~~~~~~~~~~~");
   await MyApp.copyBundleToCache("test_files", "linkfox.png");
-  await compressPath(cachePath, cachePath + "/abc.7z");
-  MyApp.showDirectoryFiles(cachePath);
-  print("compressPath end~~~~~~~~~~~~~~~~~");
-
   await MyApp.copyBundleToCache("test_files", "db.7z");
-  await decompress(cachePath + "/db.7z", cachePath + "/db");
-  MyApp.showDirectoryFiles(cachePath + "/db");
+
+  //compress file
+  List<String> files = <String>[];
+  files.add("$cachePath${seperator}linkfox.png");
+  files.add("$cachePath${seperator}db.7z");
+
+  await compressFiles(files, cachePath + "/abc.7z");
+  MyApp.showDirectoryFiles(cachePath);
+  print("compress file end~~~~~~~~~~~~~~~~~");
+
+  await decompress(cachePath + "/abc.7z", cachePath + "/db1");
+  MyApp.showDirectoryFiles(cachePath + "/db1");
+
+  //compress path
+/*  await compressPath(cachePath, cachePath + "/abc.7z");
+  MyApp.showDirectoryFiles(cachePath);
+  print("compressPath end~~~~~~~~~~~~~~~~~");*/
+
+  //decompress
+  /*await MyApp.copyBundleToCache("test_files", "db.7z");
+  await decompress(cachePath + "/db.7z", cachePath + "/db1");
+  MyApp.showDirectoryFiles(cachePath + "/db1");*/
 
   print("demo end~~~~~~~~~~~~~~~~~");
 }

@@ -18,6 +18,71 @@ public:
 
 static MyProgressDelegate * _progressDelegate = new MyProgressDelegate();
 
+static int parseStrings(char *cmd, char argv[16][512]) {
+    int size = strlen(cmd);
+    int preChar = 0;
+    int a = 0;
+    int b = 0;
+    for (int i = 0; i < size; ++i) {
+        char c = cmd[i];
+        switch (c) {
+        case ' ':
+        case '\t':
+            if (preChar == 1) {
+                argv[a][b++] = '\0';
+                a++;
+                b = 0;
+                preChar = 0;
+            }
+            break;
+
+        default:
+            preChar = 1;
+            argv[a][b++] = c;
+            break;
+        }
+    }
+
+    if (cmd[size - 1] != ' ' && cmd[size - 1] != '\t') {
+        argv[a][b] = '\0';
+        a++;
+    }
+    return a;
+}
+
+extern "C" int32_t compressFiles(char *files, char *toZipFullPath){
+    try {
+         const auto archivePathOutStream = makeSharedOutStream(Path(toZipFullPath));
+
+         // 2. Create encoder with output stream, type of the archive, compression method and optional progress delegate.
+         auto encoder = makeSharedEncoder(archivePathOutStream, plzma_file_type_7z, plzma_method_LZMA2);
+         encoder->setProgressDelegate(_progressDelegate);
+
+         int numArgs;
+         // 最大支持16个参数
+         char temp[16][512] = {0};
+         numArgs = parseStrings(files, temp);
+         char *args[16] = {0};
+         for (int i = 0; i < numArgs; ++i) {
+             args[i] = temp[i];
+         }
+
+         for (int i = 0; i < numArgs; i++){
+             encoder->add(Path(args[i]));
+         }
+
+         // 3. Open.
+         bool opened = encoder->open();
+
+         // 4. Compress.
+         bool compressed = encoder->compress();
+         return 0;
+    } catch (const Exception & exception) {
+         std::cout << "Exception: " << exception.what() << std::endl;
+         return 1;
+    }
+}
+
 extern "C" int32_t compressPath(char *fromPath, char *toZipFullPath){
     try {
         // 1. Create output stream for writing archive's file content.
