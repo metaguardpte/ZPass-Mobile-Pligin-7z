@@ -10,10 +10,9 @@
 #include <errno.h>
 #include <grp.h>
 #include <pwd.h>
-#include <sys/sysmacros.h>
 
+// for major()/minor():
 #if !defined(LIBPLZMA)
-//for major()/minor():
 #if defined(__FreeBSD__) || defined(BSD)
 #include <sys/types.h>
 #else
