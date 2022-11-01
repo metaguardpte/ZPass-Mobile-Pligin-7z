@@ -39,7 +39,7 @@ flutter:
         package: com.example.zip_plugin
         pluginClass: ZipPlugin
       ios:
-        pluginClass: ZipPlugin
+        pluginClass: P7zip
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
