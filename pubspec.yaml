@@ -1,7 +1,7 @@
 name: p7zip
 description: A new Flutter plugin project.
 version: 0.0.1
-homepage:
+homepage: https://git.ziniao.com/A25-Hubstudio-INT/a25-zpass-mobile/a25-zpass-mobile-plugin-7z
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_lzma: ^1.0.0
   path_provider: ^2.0.11
   plugin_platform_interface: ^2.0.2
 

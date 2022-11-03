@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:ffi/src/utf8.dart';
+import 'package:flutter_lzma/flutter_lzma.dart';
 
 typedef _nativeP7zipFunc = Int32 Function(Pointer<Int8>,Pointer<Int8>);
 typedef _dartP7zipFunc = int Function(Pointer<Int8>, Pointer<Int8>);
@@ -15,12 +16,20 @@ final DynamicLibrary p7zipLib = Platform.isAndroid
     ? DynamicLibrary.open(soFile)
     : DynamicLibrary.process();
 
+final FlutterLzma lzmaPlugin = FlutterLzma();
+
 /// files would be compressed to file(toZip)
 Future<String?> compressFiles(List<String> fromFiles, String toZip) async {
-  final receivePort = ReceivePort();
-  await Isolate.spawn(_nativeCompressFiles, [receivePort.sendPort, fromFiles, toZip]);
-  final result = await receivePort.first;
-  return result == 0 ? toZip : null;
+  if (Platform.isAndroid) {
+    final receivePort = ReceivePort();
+    await Isolate.spawn(_nativeCompressFiles, [receivePort.sendPort, fromFiles, toZip]);
+    final result = await receivePort.first;
+    return result == 0 ? toZip : null;
+  } else if (Platform.isIOS) {
+    return lzmaPlugin.compressFiles(fromFiles, toZip);
+  } else {
+    return Future.error("unsupported platform");
+  }
 }
 
 /// files in this directory(fromPath) would be compressed to file(toZip)
@@ -33,10 +42,16 @@ Future<String?> compressPath(String fromPath, String toZip) async {
 
 ///zip file(fromZip) would be extracted to directory(toPath)
 Future<String?> decompress(String fromZip, String toPath) async {
-  final receivePort = ReceivePort();
-  await Isolate.spawn(_nativeDecompress, [receivePort.sendPort, fromZip, toPath]);
-  final result = await receivePort.first;
-  return result == 0 ? toPath : null;
+  if (Platform.isAndroid) {
+    final receivePort = ReceivePort();
+    await Isolate.spawn(_nativeDecompress, [receivePort.sendPort, fromZip, toPath]);
+    final result = await receivePort.first;
+    return result == 0 ? toPath : null;
+  }  else if (Platform.isIOS) {
+    return lzmaPlugin.extractFile(fromZip, toPath);
+  } else {
+    return Future.error("unsupported platform");
+  }
 }
 
 void _nativeCompressFiles(List argv) {
