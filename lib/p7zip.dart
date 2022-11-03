@@ -34,10 +34,16 @@ Future<String?> compressFiles(List<String> fromFiles, String toZip) async {
 
 /// files in this directory(fromPath) would be compressed to file(toZip)
 Future<String?> compressPath(String fromPath, String toZip) async {
-  final receivePort = ReceivePort();
-  await Isolate.spawn(_nativeCompressPath, [receivePort.sendPort, fromPath, toZip]);
-  final result = await receivePort.first;
-  return result == 0 ? toZip : null;
+  if (Platform.isAndroid) {
+    final receivePort = ReceivePort();
+    await Isolate.spawn(_nativeCompressPath, [receivePort.sendPort, fromPath, toZip]);
+    final result = await receivePort.first;
+    return result == 0 ? toZip : null;
+  } else if (Platform.isIOS) {
+    return lzmaPlugin.compressDir(fromPath, toZip);
+  } else {
+    return Future.error("unsupported platform");
+  }
 }
 
 ///zip file(fromZip) would be extracted to directory(toPath)
